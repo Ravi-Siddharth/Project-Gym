@@ -18,6 +18,7 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Step 1: Request OTP
   const handleSendOtp = async (e) => {
@@ -35,7 +36,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/api/auth/forgot-password`,
+        `${API_URL}/api/auth/forgot-password`,
         { email: email.trim() }
       );
 
@@ -71,7 +72,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/api/auth/verify-otp`,
+        `${API_URL}/api/auth/verify-otp`,
         {
           email: email.trim(),
           otp: otp.trim()
@@ -115,7 +116,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/api/auth/reset-password`,
+        `${API_URL}/api/auth/reset-password`,
         {
           email: email.trim(),
           otp: otp.trim(),

@@ -19,11 +19,13 @@ import Sidebar from "./Sidebar";
 import "./WorkoutHistory.css";
 
 function WorkoutHistory() {
-  const navigate = useNavigate();
-
+  
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWorkouts = async () => {
@@ -37,7 +39,7 @@ function WorkoutHistory() {
 
       try {
         const response = await axios.get(
-          `${import.meta.env.API_URL}/api/user/workouts`,
+          `${API_URL}/api/user/workouts`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

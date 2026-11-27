@@ -33,6 +33,7 @@ function Profile() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // GET TOKEN FROM CURRENT BROWSER TAB
   const token = sessionStorage.getItem("token");
@@ -45,7 +46,7 @@ function Profile() {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.API_URL}/api/user/profile`, {
+        const response = await axios.get(`${API_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -112,7 +113,7 @@ function Profile() {
       setSaving(true);
 
       const response = await axios.put(
-        `${import.meta.env.API_URL}/api/user/profile`,
+        `${API_URL}/api/user/profile`,
         {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
@@ -198,7 +199,7 @@ function Profile() {
       setSuccess("");
 
       const response = await axios.put(
-        `${import.meta.env.API_URL}/api/user/profile-picture`,
+        `${API_URL}/api/user/profile-picture`,
         formDataToUpload,
         {
           headers: {

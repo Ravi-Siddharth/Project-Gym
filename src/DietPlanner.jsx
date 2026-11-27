@@ -41,6 +41,7 @@ function DietPlanner() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Expand and collapse saved diet plans
   const [expandedPlanId, setExpandedPlanId] = useState(null);
@@ -57,7 +58,7 @@ function DietPlanner() {
 
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.API_URL}/api/users/diets`, {
+        const response = await axios.get(`${API_URL}/api/users/diets`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -142,7 +143,7 @@ function DietPlanner() {
       setSaving(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/api/users/diets`,
+        `${API_URL}/api/users/diets`,
         {
           planName: planName.trim(),
           planDate: planDate,

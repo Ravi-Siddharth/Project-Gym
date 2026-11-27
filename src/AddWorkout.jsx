@@ -35,6 +35,7 @@ function AddWorkout() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const categories = [
     "Chest",
@@ -186,7 +187,7 @@ function AddWorkout() {
       }
 
       await axios.post(
-        `${import.meta.env.API_URL}/api/user/workouts`,
+        `${API_URL}/api/user/workouts`,
         workoutData,
         {
           headers: {

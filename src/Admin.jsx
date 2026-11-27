@@ -32,6 +32,7 @@ function Admin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // GET TOKEN FROM CURRENT BROWSER TAB
   const token = sessionStorage.getItem("token");
@@ -46,7 +47,7 @@ function Admin() {
     const loadUsers = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.API_URL}/api/admin/dashboard`,
+          `${API_URL}/api/admin/dashboard`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -89,7 +90,7 @@ function Admin() {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.API_URL}/api/admin/users/${user._id}`,
+        `${API_URL}/api/admin/users/${user._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -131,7 +132,7 @@ function Admin() {
       setDeletingId(userId);
 
       await axios.delete(
-        `${import.meta.env.API_URL}api/admin/users/${userId}`,
+        `${API_URL}api/admin/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

@@ -19,6 +19,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -67,7 +68,7 @@ function Register() {
     try {
       setLoading(true);
 
-      await axios.post(`${import.meta.env.API_URL}/api/auth/register`, {
+      await axios.post(`${API_URL}/api/auth/register`, {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
