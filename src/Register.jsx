@@ -67,7 +67,7 @@ function Register() {
     try {
       setLoading(true);
 
-      await axios.post("https://gym-tracker-ldfr.vercel.app/api/auth/register", {
+      await axios.post(`${import.meta.env.API_URL}/auth/register`, {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),

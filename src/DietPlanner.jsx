@@ -57,7 +57,7 @@ function DietPlanner() {
 
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(API_URL, {
+        const response = await axios.get(`${import.meta.env.API_URL}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

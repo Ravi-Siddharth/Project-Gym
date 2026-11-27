@@ -37,7 +37,7 @@ function WorkoutHistory() {
 
       try {
         const response = await axios.get(
-          "https://gym-tracker-ldfr.vercel.app/api/user/workouts",
+          `${import.meta.env}/user/workouts`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -26,7 +26,7 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-        "https://gym-tracker-ldfr.vercel.app/api/auth/login",
+        `${import.meta.env.API_URL}/auth/login`,
         {
           email: email.trim(),
           password

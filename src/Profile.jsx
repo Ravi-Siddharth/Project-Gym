@@ -68,7 +68,7 @@ function Profile() {
           picture
             ? picture.startsWith("http")
               ? picture
-              : `https://gym-tracker-ldfr.vercel.app/${picture}`
+              : `https://project-gym-backend.onrender.com/api${picture}`
             : ""
         );
       } catch (err) {
@@ -218,7 +218,7 @@ function Profile() {
         setProfilePicture(
           pictureUrl.startsWith("http")
             ? pictureUrl
-            : `https://gym-tracker-ldfr.vercel.app/${pictureUrl}`
+            : `https://project-gym-backend.onrender.com/api${pictureUrl}`
         );
       }
 

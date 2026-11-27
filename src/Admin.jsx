@@ -69,7 +69,7 @@ function Admin() {
           status === 403
             ? "Access denied. Only administrators can view this page."
             : err.response?.data?.message ||
-              "Unable to load users."
+            "Unable to load users."
         );
       } finally {
         setLoading(false);
@@ -172,11 +172,11 @@ function Admin() {
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          timeZone: "UTC"
-        })
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC"
+      })
       : "—";
   };
 
