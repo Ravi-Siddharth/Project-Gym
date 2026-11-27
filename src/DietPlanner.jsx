@@ -58,7 +58,7 @@ function DietPlanner() {
 
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/users/diets`, {
+        const response = await axios.get(`${API_URL}/api/user/diets`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -143,7 +143,7 @@ function DietPlanner() {
       setSaving(true);
 
       const response = await axios.post(
-        `${API_URL}/api/users/diets`,
+        `${API_URL}/api/user/diets`,
         {
           planName: planName.trim(),
           planDate: planDate,
