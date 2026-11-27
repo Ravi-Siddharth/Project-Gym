@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import {
   UserRound,
   Camera,
@@ -9,13 +10,11 @@ import {
   Save,
   ShieldCheck,
   CheckCircle,
-  AlertCircle,
-  Image
+  AlertCircle
 } from "lucide-react";
 
 import Sidebar from "./Sidebar";
 import "./Profile.css";
-
 
 function Profile() {
   const navigate = useNavigate();
@@ -27,17 +26,68 @@ function Profile() {
   });
 
   const [profilePicture, setProfilePicture] = useState("");
+  const [imageFailed, setImageFailed] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const API_URL = import.meta.env.VITE_API_URL;
 
-  // GET TOKEN FROM CURRENT BROWSER TAB
+  // API CONFIGURATION
+  const API_BASE_URL = (
+    import.meta.env.VITE_API_URL || ""
+  ).replace(/\/+$/, "");
+
+  const API_URL = API_BASE_URL.endsWith("/api")
+    ? API_BASE_URL
+    : `${API_BASE_URL}/api`;
+
+  const BACKEND_URL = API_URL.replace(/\/api$/, "");
+
+  // GET TOKEN
   const token = sessionStorage.getItem("token");
 
+  // IMAGE URL CONVERSION
+  const getImageUrl = (picture) => {
+    if (!picture) return "";
+
+    // Check whether URL is absolute
+    if (picture.startsWith("http")) {
+      try {
+        const url = new URL(picture);
+
+        // Convert old localhost URLs to Render URL
+        if (
+          url.hostname === "localhost" ||
+          url.hostname === "127.0.0.1"
+        ) {
+          return `${BACKEND_URL}${url.pathname}${url.search}`;
+        }
+
+        return picture;
+      } catch {
+        return picture;
+      }
+    }
+
+    // Handle relative image paths
+    let imagePath = picture.startsWith("/")
+      ? picture
+      : `/${picture}`;
+
+    // Remove incorrect /api prefix from old image paths
+    imagePath = imagePath.replace(
+      /^\/api(?=\/uploads)/,
+      ""
+    );
+
+    return `${BACKEND_URL}${imagePath}`;
+  };
+
+  // GET PROFILE
   useEffect(() => {
     if (!token) {
       navigate("/login", { replace: true });
@@ -46,11 +96,14 @@ function Profile() {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/user/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${API_URL}/user/profile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const user = response.data.user || response.data;
 
@@ -65,13 +118,9 @@ function Profile() {
           user.profilePicture ||
           "";
 
-        setProfilePicture(
-          picture
-            ? picture.startsWith("http")
-              ? picture
-              : `https://project-gym-backend.onrender.com/api${picture}`
-            : ""
-        );
+        setProfilePicture(getImageUrl(picture));
+        setImageFailed(false);
+
       } catch (err) {
         setError(
           err.response?.data?.message ||
@@ -84,8 +133,10 @@ function Profile() {
     };
 
     fetchProfile();
-  }, [navigate, token]);
 
+  }, [navigate, token, API_URL]);
+
+  // HANDLE INPUT CHANGES
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -95,8 +146,10 @@ function Profile() {
     }));
   };
 
+  // SAVE PROFILE
   const handleSaveProfile = async (event) => {
     event.preventDefault();
+
     setError("");
     setSuccess("");
 
@@ -113,7 +166,7 @@ function Profile() {
       setSaving(true);
 
       const response = await axios.put(
-        `${API_URL}/api/user/profile`,
+        `${API_URL}/user/profile`,
         {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
@@ -126,17 +179,26 @@ function Profile() {
         }
       );
 
-      const updatedUser = response.data.user || response.data;
+      const updatedUser =
+        response.data.user || response.data;
 
       const updatedData = {
-        firstName: updatedUser.firstName || formData.firstName.trim(),
-        lastName: updatedUser.lastName || formData.lastName.trim(),
-        email: updatedUser.email || formData.email.trim().toLowerCase(),
+        firstName:
+          updatedUser.firstName ||
+          formData.firstName.trim(),
+
+        lastName:
+          updatedUser.lastName ||
+          formData.lastName.trim(),
+
+        email:
+          updatedUser.email ||
+          formData.email.trim().toLowerCase(),
       };
 
       setFormData(updatedData);
 
-      // UPDATE USER DETAILS IN CURRENT TAB
+      // UPDATE USER DETAILS IN SESSION STORAGE
       const storedUser = JSON.parse(
         sessionStorage.getItem("user") || "{}"
       );
@@ -150,6 +212,7 @@ function Profile() {
       );
 
       setSuccess("Profile updated successfully.");
+
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -161,12 +224,17 @@ function Profile() {
     }
   };
 
+  // SELECT PROFILE PICTURE
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
 
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(
+        file.type
+      )
+    ) {
       setError("Choose a JPG, PNG, or WEBP image.");
       event.target.value = "";
       return;
@@ -180,10 +248,16 @@ function Profile() {
 
     setError("");
     setSuccess("");
+
     setSelectedFile(file);
-    setProfilePicture(URL.createObjectURL(file));
+
+    const previewURL = URL.createObjectURL(file);
+
+    setProfilePicture(previewURL);
+    setImageFailed(false);
   };
 
+  // UPLOAD PROFILE PICTURE
   const handleUploadPicture = async () => {
     if (!selectedFile) {
       setError("Please select an image first.");
@@ -191,15 +265,17 @@ function Profile() {
     }
 
     const formDataToUpload = new FormData();
+
     formDataToUpload.append("file", selectedFile);
 
     try {
       setUploading(true);
+
       setError("");
       setSuccess("");
 
       const response = await axios.put(
-        `${API_URL}/api/user/profile-picture`,
+        `${API_URL}/user/profile-picture`,
         formDataToUpload,
         {
           headers: {
@@ -216,15 +292,16 @@ function Profile() {
         data.profilePicture;
 
       if (pictureUrl) {
-        setProfilePicture(
-          pictureUrl.startsWith("http")
-            ? pictureUrl
-            : `https://project-gym-backend.onrender.com/api${pictureUrl}`
-        );
+        setProfilePicture(getImageUrl(pictureUrl));
+        setImageFailed(false);
       }
 
       setSelectedFile(null);
-      setSuccess("Profile picture uploaded successfully.");
+
+      setSuccess(
+        "Profile picture uploaded successfully."
+      );
+
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -236,6 +313,7 @@ function Profile() {
     }
   };
 
+  // USER INITIALS
   const initials =
     `${formData.firstName.charAt(0)}${formData.lastName.charAt(0)}`
       .toUpperCase() || "U";
@@ -250,15 +328,20 @@ function Profile() {
 
   return (
     <div className="profile-page">
+
       <Sidebar />
 
       <main className="profile-content">
 
+        {/* PAGE HEADER */}
         <header className="profile-header">
           <h1>My Profile</h1>
-          <p>Manage your personal information and account.</p>
+          <p>
+            Manage your personal information and account.
+          </p>
         </header>
 
+        {/* ERROR MESSAGE */}
         {error && (
           <div className="profile-error">
             <AlertCircle size={18} />
@@ -266,6 +349,7 @@ function Profile() {
           </div>
         )}
 
+        {/* SUCCESS MESSAGE */}
         {success && (
           <div className="profile-success">
             <CheckCircle size={18} />
@@ -273,36 +357,49 @@ function Profile() {
           </div>
         )}
 
+        {/* PROFILE PICTURE CARD */}
         <section className="profile-card">
 
           <div className="profile-picture-section">
 
             <div className="profile-avatar">
-              {profilePicture ? (
+
+              {profilePicture && !imageFailed ? (
                 <img
                   src={profilePicture}
                   alt="Profile"
-                  onError={(event) => {
-                    event.currentTarget.style.display = "none";
+                  onError={() => {
+                    console.error(
+                      "Profile image failed:",
+                      profilePicture
+                    );
+
+                    setImageFailed(true);
                   }}
                 />
               ) : (
                 <span>{initials}</span>
               )}
+
             </div>
 
             <div className="profile-picture-details">
+
               <h2>
                 {formData.firstName} {formData.lastName}
               </h2>
 
               <p>{formData.email}</p>
 
-              <span>JPG, PNG, or WEBP · Maximum 5 MB</span>
+              <span>
+                JPG, PNG, or WEBP · Maximum 5 MB
+              </span>
+
             </div>
 
           </div>
 
+          {/* PICTURE ACTIONS */}
           <div className="profile-picture-actions">
 
             <label
@@ -328,7 +425,10 @@ function Profile() {
               disabled={!selectedFile || uploading}
             >
               <Upload size={17} />
-              {uploading ? "Uploading..." : "Upload Picture"}
+
+              {uploading
+                ? "Uploading..."
+                : "Upload Picture"}
             </button>
 
           </div>
@@ -341,6 +441,7 @@ function Profile() {
 
         </section>
 
+        {/* PERSONAL INFORMATION */}
         <section className="profile-card">
 
           <h2>
@@ -357,7 +458,10 @@ function Profile() {
             <div className="profile-form-grid">
 
               <div className="profile-field">
-                <label htmlFor="firstName">First Name</label>
+
+                <label htmlFor="firstName">
+                  First Name
+                </label>
 
                 <input
                   id="firstName"
@@ -368,10 +472,14 @@ function Profile() {
                   autoComplete="given-name"
                   required
                 />
+
               </div>
 
               <div className="profile-field">
-                <label htmlFor="lastName">Last Name</label>
+
+                <label htmlFor="lastName">
+                  Last Name
+                </label>
 
                 <input
                   id="lastName"
@@ -382,10 +490,14 @@ function Profile() {
                   autoComplete="family-name"
                   required
                 />
+
               </div>
 
               <div className="profile-field profile-email-field">
-                <label htmlFor="email">Email Address</label>
+
+                <label htmlFor="email">
+                  Email Address
+                </label>
 
                 <input
                   id="email"
@@ -396,25 +508,32 @@ function Profile() {
                   autoComplete="email"
                   required
                 />
+
               </div>
 
             </div>
 
             <div className="profile-form-actions">
+
               <button
                 type="submit"
                 className="profile-save-button"
                 disabled={saving}
               >
                 <Save size={17} />
-                {saving ? "Saving..." : "Save Changes"}
+
+                {saving
+                  ? "Saving..."
+                  : "Save Changes"}
               </button>
+
             </div>
 
           </form>
 
         </section>
 
+        {/* ACCOUNT INFORMATION */}
         <section className="profile-card profile-account-card">
 
           <h2>
@@ -423,21 +542,27 @@ function Profile() {
           </h2>
 
           <div className="profile-account-row">
+
             <span>Account</span>
+
             <strong>FitTracker Member</strong>
+
           </div>
 
           <div className="profile-account-row">
+
             <span>Profile Status</span>
 
             <strong className="profile-status">
               Active
             </strong>
+
           </div>
 
         </section>
 
       </main>
+
     </div>
   );
 }
