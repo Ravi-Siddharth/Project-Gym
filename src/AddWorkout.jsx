@@ -186,7 +186,7 @@ function AddWorkout() {
       }
 
       await axios.post(
-        `${import.meta.env.API_URL}/user/workouts`,
+        `${import.meta.env.API_URL}/api/user/workouts`,
         workoutData,
         {
           headers: {

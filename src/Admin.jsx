@@ -46,7 +46,7 @@ function Admin() {
     const loadUsers = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.API_URL}/admin/dashboard`,
+          `${import.meta.env.API_URL}/api/admin/dashboard`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -89,7 +89,7 @@ function Admin() {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.API_URL}/admin/users/${user._id}`,
+        `${import.meta.env.API_URL}/api/admin/users/${user._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -131,7 +131,7 @@ function Admin() {
       setDeletingId(userId);
 
       await axios.delete(
-        `${import.meta.env.API_URL}/admin/users/${userId}`,
+        `${import.meta.env.API_URL}api/admin/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

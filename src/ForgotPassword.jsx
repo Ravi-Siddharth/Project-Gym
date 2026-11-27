@@ -35,7 +35,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/forgot-password`,
+        `${import.meta.env.API_URL}/api/auth/forgot-password`,
         { email: email.trim() }
       );
 
@@ -71,7 +71,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/verify-otp`,
+        `${import.meta.env.API_URL}/api/auth/verify-otp`,
         {
           email: email.trim(),
           otp: otp.trim()
@@ -115,7 +115,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/reset-password`,
+        `${import.meta.env.API_URL}/api/auth/reset-password`,
         {
           email: email.trim(),
           otp: otp.trim(),

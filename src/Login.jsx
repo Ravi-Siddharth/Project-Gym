@@ -26,7 +26,7 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-        `${import.meta.env.API_URL}/auth/login`,
+        `${import.meta.env.API_URL}/api/auth/login`,
         {
           email: email.trim(),
           password

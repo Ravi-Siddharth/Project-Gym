@@ -37,7 +37,7 @@ function WorkoutHistory() {
 
       try {
         const response = await axios.get(
-          `${import.meta.env}/user/workouts`,
+          `${import.meta.env.API_URL}/api/user/workouts`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -45,7 +45,7 @@ function Profile() {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.API_URL}/user/profile`, {
+        const response = await axios.get(`${import.meta.env.API_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -112,7 +112,7 @@ function Profile() {
       setSaving(true);
 
       const response = await axios.put(
-        `${import.meta.env.API_URL}/user/profile`,
+        `${import.meta.env.API_URL}/api/user/profile`,
         {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
@@ -198,7 +198,7 @@ function Profile() {
       setSuccess("");
 
       const response = await axios.put(
-        `${import.meta.env.API_URL}/user/profile-picture`,
+        `${import.meta.env.API_URL}/api/user/profile-picture`,
         formDataToUpload,
         {
           headers: {
